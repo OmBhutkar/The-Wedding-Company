@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ package.name }} - The Wedding Company{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0"><i class="bi bi-gift me-2"></i>{{ package.name }}</h3>
+                        <small class="text-white-50">Complete wedding package</small>
+                    </div>
+                    {% if package.is_active %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4 p-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 10px;">
+                    <h1 class="text-primary mb-2">₹{{ package.price|floatformat:0 }}</h1>
+                    <p class="text-muted mb-0">Starting Price (INR)</p>
+                </div>
+                
+                <p class="lead">{{ package.description }}</p>
+                
+                <hr>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded">
+                            <h6 class="text-muted mb-2"><i class="bi bi-people me-2"></i>Guest Capacity</h6>
+                            <h4 class="mb-0">
+                                {{ package.guest_capacity_min }}
+                                {% if package.guest_capacity_max %} - {{ package.guest_capacity_max }}{% endif %}
+                                <small class="text-muted">guests</small>
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded">
+                            <h6 class="text-muted mb-2"><i class="bi bi-calendar-check me-2"></i>Package Type</h6>
+                            <h4 class="mb-0">
+                                {% if package.price < 5000 %}
+                                    <span class="badge bg-info">Basic</span>
+                                {% elif package.price < 10000 %}
+                                    <span class="badge bg-primary">Standard</span>
+                                {% elif package.price < 20000 %}
+                                    <span class="badge bg-warning">Premium</span>
+                                {% else %}
+                                    <span class="badge bg-success">Luxury</span>
+                                {% endif %}
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+
+                {% if package.get_features_list %}
+                <div class="mb-4">
+                    <h5 class="mb-3"><i class="bi bi-star me-2"></i>Package Features</h5>
+                    <div class="row">
+                        {% for feature in package.get_features_list %}
+                        <div class="col-md-6 mb-2">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <span>{{ feature }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>Features will be displayed here once added.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Services Included</h5>
+            </div>
+            <div class="card-body">
+                {% if services %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for service in services %}
+                            <tr>
+                                <td><strong>{{ service.service_name }}</strong></td>
+                                <td>{{ service.description|default:"Service included in this package" }}</td>
+                                <td>
+                                    {% if service.included %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle me-1"></i>Included
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-x-circle me-1"></i>Not Included
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-list-ul"></i>
+                    <h5>No services added yet</h5>
+                    <p>Services for this package will be displayed here once they are added through the admin panel.</p>
+                    <div class="mt-4">
+                        <h6>Common services typically included:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Venue decoration</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Photography services</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Catering arrangements</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Music and entertainment</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Wedding planning assistance</li>
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Package Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong><i class="bi bi-currency-rupee me-2 text-primary"></i>Price:</strong>
+                    <p class="mb-0">₹{{ package.price|floatformat:0 }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong><i class="bi bi-people me-2 text-primary"></i>Capacity:</strong>
+                    <p class="mb-0">
+                        {{ package.guest_capacity_min }}
+                        {% if package.guest_capacity_max %} - {{ package.guest_capacity_max }}{% endif %} guests
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <strong><i class="bi bi-calendar me-2 text-primary"></i>Created:</strong>
+                    <p class="mb-0">{{ package.created_at|date:"F d, Y" }}</p>
+                </div>
+                {% if package.updated_at != package.created_at %}
+                <div class="mb-3">
+                    <strong><i class="bi bi-clock-history me-2 text-primary"></i>Last Updated:</strong>
+                    <p class="mb-0">{{ package.updated_at|date:"F d, Y" }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-lightning-charge me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'bookings:booking_create' %}?package_id={{ package.pk }}" class="btn btn-success w-100 mb-2">
+                    <i class="bi bi-calendar-plus me-2"></i>Book This Package
+                </a>
+                <a href="{% url 'packages:package_list' %}" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Packages
+                </a>
+                <a href="{% url 'vendors:vendor_list' %}" class="btn btn-outline-info w-100">
+                    <i class="bi bi-people me-2"></i>View Vendors
+                </a>
+            </div>
+        </div>
+
+        {% if package.get_features_list %}
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-star-fill me-2"></i>Highlights</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    {% for feature in package.get_features_list|slice:":5" %}
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>{{ feature }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Booking Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex align-items-start mb-2">
+                        <i class="bi bi-clock-history me-2 text-primary fs-5"></i>
+                        <div>
+                            <strong>Advance Booking</strong>
+                            <p class="mb-0 small text-muted">Recommended 3-6 months in advance for best availability</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex align-items-start mb-2">
+                        <i class="bi bi-credit-card me-2 text-primary fs-5"></i>
+                        <div>
+                            <strong>Payment Terms</strong>
+                            <p class="mb-0 small text-muted">50% advance payment, 50% before the event date</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <div class="d-flex align-items-start mb-2">
+                        <i class="bi bi-shield-check me-2 text-primary fs-5"></i>
+                        <div>
+                            <strong>Cancellation Policy</strong>
+                            <p class="mb-0 small text-muted">Full refund if cancelled 30+ days before event</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-headset me-2"></i>Need Help?</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">Have questions about this package? Our wedding planning team is here to help you create your perfect day!</p>
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-envelope-fill me-2 text-primary"></i>
+                        <div>
+                            <strong>Email Us</strong>
+                            <p class="mb-0 small">info@weddingcompany.com</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-telephone-fill me-2 text-primary"></i>
+                        <div>
+                            <strong>Call Us</strong>
+                            <p class="mb-0 small">+1 (555) 123-4567</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-clock-fill me-2 text-primary"></i>
+                        <div>
+                            <strong>Business Hours</strong>
+                            <p class="mb-0 small">Mon-Sat: 9 AM - 6 PM</p>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <a href="{% url 'bookings:booking_create' %}?package_id={{ package.pk }}" class="btn btn-primary w-100">
+                    <i class="bi bi-calendar-plus me-2"></i>Book Free Consultation
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

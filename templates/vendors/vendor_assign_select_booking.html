@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Assign {{ vendor.name }} - The Wedding Company{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-calendar-plus me-2"></i>Assign Vendor: {{ vendor.name }}
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Select a Booking</h6>
+                    <p class="mb-0">Choose which booking you want to assign this vendor to, or create a new booking.</p>
+                </div>
+                
+                {% if bookings %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label"><strong>Select Booking:</strong></label>
+                        <div class="list-group">
+                            {% for booking in bookings %}
+                            <label class="list-group-item list-group-item-action">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="booking_id" value="{{ booking.pk }}" id="booking_{{ booking.pk }}" required>
+                                    <label class="form-check-label w-100" for="booking_{{ booking.pk }}">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">{{ booking.event_name }}</h6>
+                                                <p class="mb-1 text-muted">
+                                                    <i class="bi bi-calendar me-1"></i>{{ booking.event_date|date:"F d, Y" }}
+                                                    <i class="bi bi-clock ms-3 me-1"></i>{{ booking.event_time|time:"g:i A" }}
+                                                </p>
+                                                <p class="mb-0 text-muted">
+                                                    <i class="bi bi-geo-alt me-1"></i>{{ booking.venue }}
+                                                    <span class="ms-3">
+                                                        <i class="bi bi-people me-1"></i>{{ booking.guest_count }} guests
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-{% if booking.status == 'pending' %}warning{% elif booking.status == 'confirmed' %}success{% elif booking.status == 'in_progress' %}info{% elif booking.status == 'completed' %}primary{% else %}danger{% endif %}">
+                                                    {{ booking.get_status_display }}
+                                                </span>
+                                                <p class="mb-0 mt-2"><strong>₹{{ booking.total_amount|floatformat:0 }}</strong></p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'vendors:vendor_detail' vendor.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-arrow-right me-2"></i>Continue to Assignment
+                        </button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <h5>No bookings available</h5>
+                    <p>You need to create a booking first before assigning vendors.</p>
+                    <div class="mt-4">
+                        <a href="{% url 'bookings:booking_create' %}" class="btn btn-success me-2">
+                            <i class="bi bi-plus-circle me-2"></i>Create New Booking
+                        </a>
+                        <a href="{% url 'vendors:vendor_detail' vendor.pk %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Vendor
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if bookings %}
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-lightbulb me-2"></i>Quick Option</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">Don't see the booking you need? Create a new booking first.</p>
+                <a href="{% url 'bookings:booking_create' %}" class="btn btn-primary w-100">
+                    <i class="bi bi-plus-circle me-2"></i>Create New Booking
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+

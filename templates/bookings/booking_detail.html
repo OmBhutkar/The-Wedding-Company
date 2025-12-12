@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ booking.event_name }} - The Wedding Company{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="bi bi-calendar-event me-2"></i>{{ booking.event_name }}</h2>
+        <p class="text-muted mb-0">
+            <i class="bi bi-calendar me-1"></i>{{ booking.event_date|date:"F d, Y" }}
+            <i class="bi bi-clock ms-3 me-1"></i>{{ booking.event_time|time:"g:i A" }}
+        </p>
+    </div>
+    <div class="action-buttons">
+        <a href="{% url 'bookings:booking_update' booking.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil me-2"></i>Edit
+        </a>
+        <a href="{% url 'bookings:booking_list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Event Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Client:</strong> {{ booking.client.username }}</p>
+                        <p><strong>Event Date:</strong> {{ booking.event_date }}</p>
+                        <p><strong>Event Time:</strong> {{ booking.event_time }}</p>
+                        <p><strong>Venue:</strong> {{ booking.venue }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Guest Count:</strong> {{ booking.guest_count }}</p>
+                        <p><strong>Status:</strong> 
+                            {% if booking.status == 'pending' %}
+                                <span class="badge bg-warning">{{ booking.get_status_display }}</span>
+                            {% elif booking.status == 'confirmed' %}
+                                <span class="badge bg-success">{{ booking.get_status_display }}</span>
+                            {% elif booking.status == 'in_progress' %}
+                                <span class="badge bg-info">{{ booking.get_status_display }}</span>
+                            {% elif booking.status == 'completed' %}
+                                <span class="badge bg-primary">{{ booking.get_status_display }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ booking.get_status_display }}</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Total Amount:</strong> ₹{{ booking.total_amount|floatformat:0 }}</p>
+                        <p><strong>Advance Paid:</strong> ₹{{ booking.advance_paid|floatformat:0 }}</p>
+                        <p><strong>Remaining:</strong> ₹{{ booking.remaining_amount|floatformat:0 }}</p>
+                    </div>
+                </div>
+                {% if booking.notes %}
+                <hr>
+                <p><strong>Notes:</strong></p>
+                <p>{{ booking.notes|linebreaks }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header bg-success text-white d-flex justify-content-between">
+                <h5 class="mb-0">Payments</h5>
+                <a href="{% url 'bookings:payment_create' booking.pk %}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus"></i> Add Payment
+                </a>
+            </div>
+            <div class="card-body">
+                {% if payments %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Transaction ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td>{{ payment.payment_date }}</td>
+                                    <td>₹{{ payment.amount|floatformat:0 }}</td>
+                                    <td>{{ payment.get_payment_method_display }}</td>
+                                    <td>{{ payment.transaction_id|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No payments recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-header bg-info text-white d-flex justify-content-between">
+                <h5 class="mb-0">Event Timeline</h5>
+                <a href="{% url 'bookings:timeline_create' booking.pk %}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus"></i> Add Item
+                </a>
+            </div>
+            <div class="card-body">
+                {% if timeline_items %}
+                    <div class="list-group">
+                        {% for item in timeline_items %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ item.title }}</h6>
+                                <span class="badge bg-{% if item.completed %}success{% else %}warning{% endif %}">
+                                    {% if item.completed %}Completed{% else %}Pending{% endif %}
+                                </span>
+                            </div>
+                            <p class="mb-1">{{ item.description }}</p>
+                            <small>{{ item.scheduled_time }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No timeline items yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'bookings:payment_create' booking.pk %}" class="btn btn-success w-100 mb-2">
+                    <i class="bi bi-cash-coin"></i> Add Payment
+                </a>
+                <a href="{% url 'bookings:timeline_create' booking.pk %}" class="btn btn-info w-100 mb-2">
+                    <i class="bi bi-clock"></i> Add Timeline Item
+                </a>
+                <a href="{% url 'vendors:vendor_assign' booking.pk %}" class="btn btn-primary w-100 mb-2">
+                    <i class="bi bi-people"></i> Assign Vendor
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

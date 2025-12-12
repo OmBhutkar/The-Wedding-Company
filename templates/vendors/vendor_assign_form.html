@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Assign Vendor - The Wedding Company{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-person-plus me-2"></i>Assign Vendor</h4>
+            </div>
+            <div class="card-body">
+                {% if vendor %}
+                <div class="alert alert-info mb-4">
+                    <h6 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Vendor Information</h6>
+                    <p class="mb-2"><strong>Vendor:</strong> {{ vendor.name }}</p>
+                    <p class="mb-2"><strong>Category:</strong> {{ vendor.category }}</p>
+                    <p class="mb-0"><strong>Base Price:</strong> ₹{{ vendor.base_price|floatformat:0 }}</p>
+                </div>
+                {% endif %}
+                
+                <div class="mb-4">
+                    <h6><i class="bi bi-calendar-event me-2"></i>Booking Details</h6>
+                    <div class="p-3 bg-light rounded">
+                        <p class="mb-1"><strong>Event:</strong> {{ booking.event_name }}</p>
+                        <p class="mb-1"><strong>Date:</strong> {{ booking.event_date|date:"F d, Y" }}</p>
+                        <p class="mb-0"><strong>Venue:</strong> {{ booking.venue }}</p>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    {% if not vendor %}
+                    <div class="mb-3">
+                        <label for="{{ form.vendor.id_for_label }}" class="form-label">Vendor</label>
+                        {{ form.vendor }}
+                        {% if form.vendor.errors %}
+                            <div class="text-danger">{{ form.vendor.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                        {{ form.vendor }}
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.service_date.id_for_label }}" class="form-label">Service Date</label>
+                            {{ form.service_date }}
+                            {% if form.service_date.errors %}
+                                <div class="text-danger">{{ form.service_date.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.service_time.id_for_label }}" class="form-label">Service Time</label>
+                            {{ form.service_time }}
+                            {% if form.service_time.errors %}
+                                <div class="text-danger">{{ form.service_time.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.agreed_price.id_for_label }}" class="form-label">
+                            Agreed Price {% if vendor %}<span class="badge bg-info">Pre-filled</span>{% endif %}
+                        </label>
+                        {{ form.agreed_price }}
+                        {% if form.agreed_price.errors %}
+                            <div class="text-danger">{{ form.agreed_price.errors }}</div>
+                        {% endif %}
+                        {% if vendor %}
+                        <small class="text-muted d-block mt-1">Base price: ₹{{ vendor.base_price|floatformat:0 }} (can be modified)</small>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                        {{ form.notes }}
+                    </div>
+                    {% if vendor %}
+                        {{ form.vendor }}
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% if vendor %}{% url 'vendors:vendor_detail' vendor.pk %}{% else %}{% url 'bookings:booking_detail' booking.pk %}{% endif %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-2"></i>Assign Vendor
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

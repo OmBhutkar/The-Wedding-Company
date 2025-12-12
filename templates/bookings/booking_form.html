@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - The Wedding Company{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>{{ title }}</h4>
+            </div>
+            <div class="card-body">
+                {% if package %}
+                <div class="alert alert-info mb-4">
+                    <h6 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Booking from Package</h6>
+                    <p class="mb-2"><strong>Package:</strong> {{ package.name }}</p>
+                    <p class="mb-2"><strong>Price:</strong> ₹{{ package.price|floatformat:0 }}</p>
+                    <p class="mb-0"><strong>Guest Capacity:</strong> {{ package.guest_capacity_min }}{% if package.guest_capacity_max %} - {{ package.guest_capacity_max }}{% endif %} guests</p>
+                </div>
+                {% endif %}
+                <form method="post" id="booking-form" novalidate>
+                    {% csrf_token %}
+                    {% if user.is_admin_user or user.is_staff_user %}
+                    <div class="mb-3">
+                        <label for="{{ form.client.id_for_label }}" class="form-label">Client</label>
+                        {{ form.client }}
+                        {% if form.client.errors %}
+                            <div class="text-danger">{{ form.client.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                        {{ form.client }}
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.event_name.id_for_label }}" class="form-label">
+                                Event Name {% if package %}<span class="badge bg-info">Pre-filled</span>{% endif %}
+                            </label>
+                            {{ form.event_name }}
+                            {% if form.event_name.errors %}
+                                <div class="text-danger">{{ form.event_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.venue.id_for_label }}" class="form-label">Venue</label>
+                            {{ form.venue }}
+                            {% if form.venue.errors %}
+                                <div class="text-danger">{{ form.venue.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.event_date.id_for_label }}" class="form-label">Event Date</label>
+                            {{ form.event_date }}
+                            {% if form.event_date.errors %}
+                                <div class="text-danger">{{ form.event_date.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.event_time.id_for_label }}" class="form-label">Event Time</label>
+                            {{ form.event_time }}
+                            {% if form.event_time.errors %}
+                                <div class="text-danger">{{ form.event_time.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.guest_count.id_for_label }}" class="form-label">
+                                Guest Count {% if package %}<span class="badge bg-info">Pre-filled</span>{% endif %}
+                            </label>
+                            {{ form.guest_count }}
+                            {% if form.guest_count.errors %}
+                                <div class="text-danger">{{ form.guest_count.errors }}</div>
+                            {% endif %}
+                            {% if package %}
+                            <small class="text-muted">Package capacity: {{ package.guest_capacity_min }}{% if package.guest_capacity_max %} - {{ package.guest_capacity_max }}{% endif %} guests</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.total_amount.id_for_label }}" class="form-label">
+                                Total Amount {% if package %}<span class="badge bg-info">Pre-filled</span>{% endif %}
+                            </label>
+                            {{ form.total_amount }}
+                            {% if form.total_amount.errors %}
+                                <div class="text-danger">{{ form.total_amount.errors }}</div>
+                            {% endif %}
+                            {% if package %}
+                            <small class="text-muted d-block mt-1">Based on package: ₹{{ package.price|floatformat:0 }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.advance_paid.id_for_label }}" class="form-label">Advance Paid</label>
+                            {{ form.advance_paid }}
+                            {% if form.advance_paid.errors %}
+                                <div class="text-danger">{{ form.advance_paid.errors }}</div>
+                            {% endif %}
+                            {% if package %}
+                            <small class="text-muted d-block mt-1">Recommended: 50% advance payment</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                                <div class="text-danger">{{ form.status.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                        {{ form.notes }}
+                        {% if form.notes.errors %}
+                            <div class="text-danger">{{ form.notes.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% if booking %}{% url 'bookings:booking_detail' booking.pk %}{% else %}{% url 'bookings:booking_list' %}{% endif %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submit-booking-btn">
+                            <i class="bi bi-check-circle me-2"></i>Save Booking
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

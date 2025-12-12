@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Packages - The Wedding Company{% endblock %}
+
+{% block content %}
+<div class="page-hero glass-card">
+    <div>
+        <div class="hero-eyebrow">Curated experiences</div>
+        <h2 class="hero-title mb-0"><i class="bi bi-box-seam me-2"></i>Wedding Packages</h2>
+        <div class="hero-meta">
+            <span class="tag-chip"><i class="bi bi-stars"></i>{{ packages|length }} available</span>
+            <span class="tag-chip info"><i class="bi bi-lightning-charge"></i>Pick & book fast</span>
+        </div>
+    </div>
+    <div class="hero-actions d-flex gap-2">
+        <a href="{% url 'bookings:booking_create' %}" class="btn btn-primary">
+            <i class="bi bi-calendar-plus me-2"></i>Create Booking
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    {% for package in packages %}
+    <div class="col-md-4 mb-4">
+        <div class="card package-card shadow h-100">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-gift me-2"></i>{{ package.name }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h2 class="text-primary mb-0">₹{{ package.price|floatformat:0 }}</h2>
+                    <small class="text-muted">Starting Price</small>
+                </div>
+                <p class="text-muted">{{ package.description|truncatewords:20 }}</p>
+                <hr>
+                <p class="mb-2">
+                    <i class="bi bi-people me-2 text-primary"></i><strong>Guest Capacity:</strong> 
+                    {{ package.guest_capacity_min }}
+                    {% if package.guest_capacity_max %} - {{ package.guest_capacity_max }} guests{% endif %}
+                </p>
+                <h6 class="mt-3 mb-2"><i class="bi bi-star me-1"></i>Key Features:</h6>
+                <ul class="list-unstyled">
+                    {% for feature in package.get_features_list|slice:":5" %}
+                    <li class="mb-1">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>{{ feature }}
+                    </li>
+                    {% endfor %}
+                    {% if package.get_features_list|length > 5 %}
+                    <li class="text-muted"><small>+ {{ package.get_features_list|length|add:"-5" }} more features</small></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="card-footer bg-white">
+                <a href="{% url 'packages:package_detail' package.pk %}" class="btn btn-primary w-100">
+                    <i class="bi bi-arrow-right-circle me-2"></i>View Full Details
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="empty-state">
+            <i class="bi bi-box"></i>
+            <h5>No packages available</h5>
+            <p>Packages will be displayed here once they are added</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+

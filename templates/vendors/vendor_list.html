@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Vendors - The Wedding Company{% endblock %}
+
+{% block content %}
+<div class="page-hero glass-card">
+    <div>
+        <div class="hero-eyebrow">Partner network</div>
+        <h2 class="hero-title"><i class="bi bi-people me-2"></i>Vendors</h2>
+        <div class="hero-meta">
+            <span class="tag-chip"><i class="bi bi-briefcase"></i>{{ vendors|length }} vendors</span>
+            {% if category_filter %}
+            <span class="tag-chip info"><i class="bi bi-filter"></i>Category filter on</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="hero-actions d-flex gap-2">
+        {% if user.is_admin_user or user.is_staff_user %}
+        <a href="{% url 'vendors:vendor_create' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle me-2"></i>New Vendor
+        </a>
+        {% endif %}
+        <a href="{% url 'packages:package_list' %}" class="btn btn-outline-primary">
+            <i class="bi bi-box-seam me-2"></i>View Packages
+        </a>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        <form method="get" class="mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Search vendors..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"s" %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            {% for vendor in vendors %}
+            <div class="col-md-4 mb-4">
+                <div class="card vendor-card h-100 shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title mb-0">{{ vendor.name }}</h5>
+                            {% if vendor.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-tag me-1"></i><strong>{{ vendor.category|default:"Uncategorized" }}</strong>
+                        </p>
+                        <p class="card-text text-muted">{{ vendor.service_description|truncatewords:15 }}</p>
+                        <hr>
+                        <div class="vendor-info">
+                            <p class="mb-2">
+                                <i class="bi bi-person me-2 text-primary"></i><strong>Contact:</strong> {{ vendor.contact_person }}
+                            </p>
+                            <p class="mb-2">
+                                <i class="bi bi-telephone me-2 text-primary"></i><strong>Phone:</strong> {{ vendor.phone }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div>
+                                    <strong class="text-success">₹{{ vendor.base_price|floatformat:0 }}</strong>
+                                    <small class="text-muted d-block">Base Price</small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="rating">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= vendor.rating|floatformat:0|add:"0" %}
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                            {% else %}
+                                                <i class="bi bi-star text-muted"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <small class="text-muted">{{ vendor.rating }}/5.0</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <div class="action-buttons">
+                            <a href="{% url 'vendors:vendor_detail' vendor.pk %}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-eye me-1"></i>View
+                            </a>
+                            {% if user.is_admin_user or user.is_staff_user %}
+                            <a href="{% url 'vendors:vendor_update' vendor.pk %}" class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil me-1"></i>Edit
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <h5>No vendors found</h5>
+                    <p>Try adjusting your search or filter criteria</p>
+                    {% if user.is_admin_user or user.is_staff_user %}
+                    <a href="{% url 'vendors:vendor_create' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle me-2"></i>Add Your First Vendor
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

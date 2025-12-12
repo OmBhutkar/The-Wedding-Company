@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ vendor.name }} - The Wedding Company{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="bi bi-people me-2"></i>{{ vendor.name }}</h2>
+        <p class="text-muted mb-0">
+            <i class="bi bi-tag me-1"></i>{{ vendor.category|default:"Uncategorized" }}
+        </p>
+    </div>
+    <div class="action-buttons">
+        <a href="{% url 'vendors:vendor_assign_from_detail' vendor.pk %}" class="btn btn-success">
+            <i class="bi bi-calendar-plus me-2"></i>Assign/Book Vendor
+        </a>
+        {% if user.is_admin_user or user.is_staff_user %}
+        <a href="{% url 'vendors:vendor_update' vendor.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil me-2"></i>Edit
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Vendor Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Category:</strong> {{ vendor.category }}</p>
+                        <p><strong>Contact Person:</strong> {{ vendor.contact_person }}</p>
+                        <p><strong>Email:</strong> {{ vendor.email|default:"Not provided" }}</p>
+                        <p><strong>Phone:</strong> {{ vendor.phone }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Base Price:</strong> ₹{{ vendor.base_price|floatformat:0 }}</p>
+                        <p><strong>Rating:</strong> {{ vendor.rating }}/5.0</p>
+                        <p><strong>Status:</strong> 
+                            {% if vendor.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% if vendor.address %}
+                <hr>
+                <p><strong>Address:</strong></p>
+                <p>{{ vendor.address|linebreaks }}</p>
+                {% endif %}
+                <hr>
+                <p><strong>Service Description:</strong></p>
+                <p>{{ vendor.service_description|linebreaks }}</p>
+                {% if vendor.notes %}
+                <hr>
+                <p><strong>Notes:</strong></p>
+                <p>{{ vendor.notes|linebreaks }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if assignments %}
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Recent Assignments</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in assignments %}
+                            <tr>
+                                <td><a href="{% url 'bookings:booking_detail' assignment.booking.pk %}" class="text-decoration-none">{{ assignment.booking.event_name }}</a></td>
+                                <td>{{ assignment.service_date|date:"M d, Y" }}</td>
+                                <td>{{ assignment.service_time|time:"g:i A" }}</td>
+                                <td><strong>₹{{ assignment.agreed_price|floatformat:0 }}</strong></td>
+                                <td>
+                                    <a href="{% url 'bookings:booking_detail' assignment.booking.pk %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <h5>No assignments yet</h5>
+                    <p>This vendor hasn't been assigned to any bookings yet.</p>
+                    <a href="{% url 'vendors:vendor_assign_from_detail' vendor.pk %}" class="btn btn-success">
+                        <i class="bi bi-calendar-plus me-2"></i>Assign to Booking
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-lightning-charge me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'vendors:vendor_assign_from_detail' vendor.pk %}" class="btn btn-success w-100 mb-2">
+                    <i class="bi bi-calendar-plus me-2"></i>Assign to Booking
+                </a>
+                <a href="{% url 'bookings:booking_create' %}" class="btn btn-primary w-100 mb-2">
+                    <i class="bi bi-plus-circle me-2"></i>Create New Booking
+                </a>
+                <a href="{% url 'vendors:vendor_list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Vendors
+                </a>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Vendor Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong><i class="bi bi-currency-rupee me-2 text-primary"></i>Base Price:</strong>
+                    <p class="mb-0">₹{{ vendor.base_price|floatformat:0 }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong><i class="bi bi-star-fill me-2 text-warning"></i>Rating:</strong>
+                    <p class="mb-0">
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= vendor.rating|floatformat:0|add:"0" %}
+                                <i class="bi bi-star-fill text-warning"></i>
+                            {% else %}
+                                <i class="bi bi-star text-muted"></i>
+                            {% endif %}
+                        {% endfor %}
+                        {{ vendor.rating }}/5.0
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <strong><i class="bi bi-calendar-check me-2 text-primary"></i>Total Assignments:</strong>
+                    <p class="mb-0">{{ vendor.assignments.count }}</p>
+                </div>
+                <div>
+                    <strong><i class="bi bi-telephone me-2 text-primary"></i>Contact:</strong>
+                    <p class="mb-0">{{ vendor.phone }}</p>
+                    {% if vendor.email %}
+                    <p class="mb-0"><a href="mailto:{{ vendor.email }}" class="text-decoration-none">{{ vendor.email }}</a></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

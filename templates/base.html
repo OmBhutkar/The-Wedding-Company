@@ -1,0 +1,210 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}The Wedding Company{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body data-theme="">
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'bookings:dashboard' %}">
+                <i class="bi bi-heart-fill me-2"></i> The Wedding Company
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'bookings:dashboard' %}">
+                            <i class="bi bi-house-door me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'bookings:booking_list' %}">
+                            <i class="bi bi-calendar-event me-1"></i> Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'vendors:vendor_list' %}">
+                            <i class="bi bi-people me-1"></i> Vendors
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'packages:package_list' %}">
+                            <i class="bi bi-box-seam me-1"></i> Packages
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav align-items-lg-center">
+                    <li class="nav-item me-2">
+                        <button class="btn btn-outline-light btn-sm d-flex align-items-center gap-2 theme-toggle" type="button" id="themeToggle" aria-label="Toggle theme">
+                            <i class="bi bi-moon-stars"></i>
+                            <span class="d-none d-lg-inline">Dark mode</span>
+                        </button>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-person me-2"></i> Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:login' %}">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-light ms-2" href="{% url 'accounts:register' %}">
+                                <i class="bi bi-person-plus me-1"></i> Register
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer-enhanced mt-5">
+        <div class="container">
+            <div class="row py-5">
+                <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+                    <div class="footer-brand">
+                        <h4 class="mb-3">
+                            <i class="bi bi-heart-fill me-2 text-danger"></i>
+                            <span class="text-white">The Wedding Company</span>
+                        </h4>
+                        <p class="text-light mb-3">Your trusted partner for creating unforgettable wedding experiences. We make your special day perfect.</p>
+                        <div class="social-links">
+                            <a href="#" class="social-link" data-bs-toggle="tooltip" title="Facebook">
+                                <i class="bi bi-facebook"></i>
+                            </a>
+                            <a href="#" class="social-link" data-bs-toggle="tooltip" title="Instagram">
+                                <i class="bi bi-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link" data-bs-toggle="tooltip" title="Twitter">
+                                <i class="bi bi-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link" data-bs-toggle="tooltip" title="LinkedIn">
+                                <i class="bi bi-linkedin"></i>
+                            </a>
+                            <a href="#" class="social-link" data-bs-toggle="tooltip" title="YouTube">
+                                <i class="bi bi-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                    <h5 class="footer-heading mb-4">Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'bookings:dashboard' %}"><i class="bi bi-chevron-right me-2"></i>Dashboard</a></li>
+                        <li><a href="{% url 'bookings:booking_list' %}"><i class="bi bi-chevron-right me-2"></i>Bookings</a></li>
+                        <li><a href="{% url 'vendors:vendor_list' %}"><i class="bi bi-chevron-right me-2"></i>Vendors</a></li>
+                        <li><a href="{% url 'packages:package_list' %}"><i class="bi bi-chevron-right me-2"></i>Packages</a></li>
+                        <li><a href="{% url 'accounts:profile' %}"><i class="bi bi-chevron-right me-2"></i>Profile</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="footer-heading mb-4">Services</h5>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'packages:package_list' %}"><i class="bi bi-chevron-right me-2"></i>Wedding Planning</a></li>
+                        <li><a href="{% url 'vendors:vendor_list' %}"><i class="bi bi-chevron-right me-2"></i>Vendor Management</a></li>
+                        <li><a href="{% url 'bookings:booking_create' %}"><i class="bi bi-chevron-right me-2"></i>Event Booking</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-2"></i>Consultation</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-heading mb-4">Contact Us</h5>
+                    <ul class="footer-contact">
+                        <li class="mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-geo-alt-fill me-3 text-primary fs-5"></i>
+                                <div>
+                                    <strong class="text-white">Address</strong>
+                                    <p class="mb-0 text-light small">123 Wedding Street,<br>Mumbai, Maharashtra 400001</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-envelope-fill me-3 text-primary fs-5"></i>
+                                <div>
+                                    <strong class="text-white">Email</strong>
+                                    <p class="mb-0"><a href="mailto:info@weddingcompany.com" class="text-light small">info@weddingcompany.com</a></p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-telephone-fill me-3 text-primary fs-5"></i>
+                                <div>
+                                    <strong class="text-white">Phone</strong>
+                                    <p class="mb-0"><a href="tel:+919876543210" class="text-light small">+91 98765 43210</a></p>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-clock-fill me-3 text-primary fs-5"></i>
+                                <div>
+                                    <strong class="text-white">Hours</strong>
+                                    <p class="mb-0 text-light small">Mon-Sat: 9 AM - 7 PM</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="row py-3">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 text-light">
+                        &copy; 2024 <strong>The Wedding Company</strong>. All rights reserved.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">
+                        <a href="#" class="text-light small me-3">Privacy Policy</a>
+                        <a href="#" class="text-light small me-3">Terms of Service</a>
+                        <a href="#" class="text-light small">Cookie Policy</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="footer-decoration"></div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/custom.js' %}"></script>
+    <button class="btn btn-primary scroll-top" id="scrollTopBtn" aria-label="Back to top">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+
