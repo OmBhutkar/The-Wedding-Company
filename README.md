@@ -47,13 +47,6 @@ Already included:
 - `Procfile` (gunicorn)
 - `whitenoise` + `dj-database-url` in `settings.py`
 
-Render env vars to set (auto in render.yaml):
-- `SECRET_KEY`
-- `DEBUG=False`
-- `ALLOWED_HOSTS` = your Render URL
-- `CSRF_TRUSTED_ORIGINS` = https://yourapp.onrender.com
-- `DATABASE_URL` (from Render Postgres)
-
 ### Manual deploy steps
 1) Push to GitHub.  
 2) In Render: New → Blueprint → select repo.  
@@ -81,3 +74,4 @@ python manage.py test
 
 ## 📄 License
 Open source for learning and adaptation. Add your preferred license if needed.
+
